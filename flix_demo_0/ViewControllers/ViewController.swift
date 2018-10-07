@@ -11,10 +11,10 @@ import AlamofireImage
 import APESuperHUD
 
 class ViewController: UIViewController,
-                      UITableViewDataSource,
-                      UITableViewDelegate,
-                      UISearchBarDelegate
-
+    UITableViewDataSource,
+    UITableViewDelegate,
+    UISearchBarDelegate
+    
 {
     @IBOutlet weak var searchBar: UISearchBar!
     
@@ -25,19 +25,20 @@ class ViewController: UIViewController,
     
     var movies: [[String: Any]] = []
     var refreshControl: UIRefreshControl!
-   
     
     
-        func createAlert(errorTitle:String, message:String){
-            let alert = UIAlertController(title: errorTitle, message:message, preferredStyle: UIAlertControllerStyle.alert)
-            alert.addAction(UIAlertAction(title:"Try Again", style: UIAlertActionStyle.default, handler: { action in self.fetchMovies()
-            }))
-            self.present(alert, animated: true, completion: nil)
+    
+    func createAlert(errorTitle:String, message:String){
+        let alert = UIAlertController(title: errorTitle, message:message,
+                                      preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title:"Try Again", style: UIAlertActionStyle.default, handler: { action in self.fetchMovies()
+        }))
+        self.present(alert, animated: true, completion: nil)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         APESuperHUD.show(style: .loadingIndicator(type: .standard), title: nil, message: "Loading...")
         DispatchQueue.main.asyncAfter(deadline: .now() + 3.0, execute: {
             APESuperHUD.dismissAll(animated: true)
@@ -48,21 +49,24 @@ class ViewController: UIViewController,
         tableView.insertSubview(refreshControl, at: 0)
         self.tableView.delegate = self
         self.tableView.dataSource = self
-        fetchMovies()
-
-       
-    }
-        @objc func didPullToRefresh(_refreshControl: UIRefreshControl){
+        self.searchBar.delegate = self
+        
+        
         fetchMovies()
     }
+    
+    @objc func didPullToRefresh(_refreshControl: UIRefreshControl){
+        fetchMovies()
+    }
+    
     func fetchMovies(){
-       
+        
         let url = URL(string: "https://api.themoviedb.org/3/movie/now_playing?api_key=608629cc0f230b88228a4135194ff053")!
         
         let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
         
         let session = URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue.main)
-   
+        
         let task = session.dataTask(with: request) { (data, response, NetworkError) in
             //this will run when the network request returns
             if let error = NetworkError {
@@ -75,30 +79,21 @@ class ViewController: UIViewController,
                 self.movies = movies
                 self.tableView.reloadData()
                 self.refreshControl.endRefreshing()
-                
-                
-                
             }
         }
         task.resume()
-
-    }
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-            let searchString = searchText.components(separatedBy: " ")
-       
- 
+        
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return movies.count
     }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-//        let cell = tableView.dequeueReusableCell(withIdentifier: "MovieCell", for: indexPath) as!
-//            MovieCell
         let cell = tableView.dequeueReusableCell(withIdentifier: "MovieCell", for: indexPath) as!
-          MovieCell
+        MovieCell
         let movie = movies[indexPath.row]
-
+        
         let title = movie["title"] as! String
         let overview = movie["overview"] as! String
         
@@ -112,18 +107,26 @@ class ViewController: UIViewController,
         cell.posterImageView.af_setImage(withURL: posterURL )
         return cell
     }
+    
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-       return 180
+        return 180
     }
-   
-
-
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let cell = sender as! UITableViewCell
+        if let indexPath = tableView.indexPath(for: cell){
+            let movie = movies[indexPath.row]
+            let DetailViewController = segue.destination as! DetailViewController
+            DetailViewController.movie = movie
+        }
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
-
-
-
+    
+    
+    
 }
