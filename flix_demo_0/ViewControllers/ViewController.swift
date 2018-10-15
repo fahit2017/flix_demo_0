@@ -25,9 +25,7 @@ class ViewController: UIViewController,
     
     var movies: [[String: Any]] = []
     var refreshControl: UIRefreshControl!
-    
-    
-    
+
     func createAlert(errorTitle:String, message:String){
         let alert = UIAlertController(title: errorTitle, message:message,
                                       preferredStyle: UIAlertControllerStyle.alert)
@@ -38,8 +36,7 @@ class ViewController: UIViewController,
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        APESuperHUD.show(style: .loadingIndicator(type: .standard), title: nil, message: "Loading...")
+    APESuperHUD.show(style: .loadingIndicator(type: .standard), title: nil, message: "Loading...")
         DispatchQueue.main.asyncAfter(deadline: .now() + 3.0, execute: {
             APESuperHUD.dismissAll(animated: true)
         })
@@ -50,7 +47,8 @@ class ViewController: UIViewController,
         self.tableView.delegate = self
         self.tableView.dataSource = self
         self.searchBar.delegate = self
-        
+        tableView.rowHeight = UITableViewAutomaticDimension
+        tableView.estimatedRowHeight = 50
         
         fetchMovies()
     }
@@ -106,10 +104,6 @@ class ViewController: UIViewController,
         let posterURL = URL(string: baseURLString + posterPathString)!
         cell.posterImageView.af_setImage(withURL: posterURL )
         return cell
-    }
-    
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 180
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {

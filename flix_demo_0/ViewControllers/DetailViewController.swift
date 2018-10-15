@@ -32,7 +32,6 @@ class DetailViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         if let movie = movie {
             titleLabel.text = movie[MovieKeys.title] as? String
             releaseDateLable.text = movie[MovieKeys.releaseDate] as? String
@@ -40,12 +39,12 @@ class DetailViewController: UIViewController {
             let backdropPathString = movie[MovieKeys.backdropPath] as! String
             let posterPathString = movie[MovieKeys.posterPath] as! String
             let baseURLString = "https://image.tmdb.org/t/p/w500"
-            
             let backdropURL = URL(string: baseURLString + backdropPathString)!
             BackDropImageView.af_setImage(withURL: backdropURL)
-            
             let posterPathURL = URL(string: baseURLString + posterPathString)!
             posterImageView.af_setImage(withURL: posterPathURL)
         }
     }
+    
+    
 }
